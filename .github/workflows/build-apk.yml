@@ -12,19 +12,30 @@ jobs:
     - name: Checkout del codice
       uses: actions/checkout@v4
 
+    - name: Trova ed estrai lo ZIP con fallback
+      run: |
+        echo "Contenuto della cartella:"
+        ls -la
+        
+        # Cerca qualsiasi file zip nella cartella
+        ZIP_FILE=$(find . -maxdepth 1 -name "*.zip" | head -n 1)
+        
+        if [ -z "$ZIP_FILE" ]; then
+          echo "Errore: Nessun file zip trovato nella root!"
+          exit 1
+        fi
+        
+        echo "Trovato file zip: $ZIP_FILE"
+        unzip -o "$ZIP_FILE" -d unpacked
+        shopt -s dotglob
+        mv unpacked/*/* unpacked/*/.[^.]* ./ 2>/dev/null || true
+        rm -rf unpacked
+
     - name: Configura Java 17
       uses: actions/setup-java@v4
       with:
         distribution: 'temurin'
         java-version: '17'
-
-    - name: Estrai il file ZIP
-      run: |
-        echo "Estrazione del progetto in corso..."
-        unzip -o "JukeNissanLauncher_9_10-1_pollici.zip" -d unpacked
-        shopt -s dotglob
-        mv unpacked/*/* unpacked/*/.[^.]* ./ 2>/dev/null || true
-        rm -rf unpacked
 
     - name: Prepara Gradle Wrapper
       run: chmod +x gradlew || true
