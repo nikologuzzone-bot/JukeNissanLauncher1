@@ -60,18 +60,24 @@ jobs:
       run: |
         python3 -c "
         import glob
-        for filepath in glob.glob('**/build.gradle*', recursive=True):
-            if '.gradle' in filepath: continue
+        files = glob.glob('**/build.gradle*', recursive=True)
+        print(f'File build.gradle trovati: {files}')
+        for filepath in files:
+            if '.gradle' in filepath or 'build/' in filepath: continue
             with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
                 content = f.read()
             
             new_content = content.replace('VERSION_1_8', 'VERSION_17')
+            new_content.replace('1.8', '17')
             new_content = new_content.replace('1.8', '17')
+            new_content = new_content.replace('JavaVersion.VERSION_1_8', 'JavaVersion.VERSION_17')
             
             if new_content != content:
                 with open(filepath, 'w', encoding='utf-8') as f:
                     f.write(new_content)
-                print(f'Aggiornato con successo: {filepath}')
+                print(f'--> Aggiornato con successo: {filepath}')
+            else:
+                print(f'Nessuna modifica necessaria in: {filepath}')
         "
 
     - name: Compila APK Debug
