@@ -1,4 +1,4 @@
-name: Build Android APK
+name: Build Android APK from Zip
 
 on:
   push:
@@ -17,6 +17,18 @@ jobs:
       with:
         distribution: 'temurin'
         java-version: '17'
+
+    - name: Trova ed estrai il file ZIP
+      run: |
+        ZIP_FILE=$(find . -maxdepth 1 -name "*.zip" | head -n 1)
+        if [ -n "$ZIP_FILE" ]; then
+          echo "Trovato lo zip: $ZIP_FILE"
+          unzip -q "$ZIP_FILE" -d extracted_project
+          rsync -av extracted_project/*/ ./ 
+        else
+          echo "Nessun file zip trovato!"
+          exit 1
+        fi
 
     - name: Prepara Gradle Wrapper
       run: |
