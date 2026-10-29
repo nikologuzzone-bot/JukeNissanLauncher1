@@ -56,7 +56,7 @@ jobs:
         fi
         chmod +x gradlew
 
-    - name: Aggiorna compatibilità Java nei file di progetto
+    - name: Allinea compatibilità Java a 17 nei file di progetto
       run: |
         python3 -c "
         import glob
@@ -65,11 +65,13 @@ jobs:
             with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
                 content = f.read()
             
-            new_content = content.replace('1.8', '17').replace('JavaVersion.VERSION_1_8', 'JavaVersion.VERSION_17')
+            new_content = content.replace('VERSION_1_8', 'VERSION_17')
+            new_content = new_content.replace('1.8', '17')
+            
             if new_content != content:
                 with open(filepath, 'w', encoding='utf-8') as f:
                     f.write(new_content)
-                print(f'Aggiornato: {filepath}')
+                print(f'Aggiornato con successo: {filepath}')
         "
 
     - name: Compila APK Debug
