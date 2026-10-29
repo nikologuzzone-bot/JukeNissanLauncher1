@@ -12,7 +12,13 @@ jobs:
     - name: Checkout del codice
       uses: actions/checkout@v4
 
-    - name: Estrai lo ZIP con Python
+    - name: Configura Java 17
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - name: Estrai lo ZIP e posiziona i file con Python
       run: |
         python3 -c "
         import glob, zipfile, os, shutil
@@ -25,11 +31,11 @@ jobs:
         with zipfile.ZipFile(zip_name, 'r') as zip_ref:
             zip_ref.extractall('unzipped_folder')
         
-        # Sposta i file nella root
         src = 'unzipped_folder'
         items = os.listdir(src)
         if len(items) == 1 and os.path.isdir(os.path.join(src, items[0])):
             src = os.path.join(src, items[0])
+            
         for item in os.listdir(src):
             s = os.path.join(src, item)
             d = os.path.join('.', item)
@@ -38,17 +44,17 @@ jobs:
                 else: os.remove(d)
             shutil.move(s, d)
         shutil.rmtree('unzipped_folder')
-        print('Estrazione completata con successo!')
+        print('Estrazione e spostamento completati!')
         "
 
-    - name: Configura Java 17
-      uses: actions/setup-java@v4
-      with:
-        distribution: 'temurin'
-        java-version: '17'
-
-    - name: Prepara Gradle Wrapper
-      run: chmod +x gradlew || true
+    - name: Verifica e Prepara Gradle
+      run: |
+        ls -la
+        if [ ! -f "gradlew" ]; then
+          echo "Gradlew non trovato nella root, genero il wrapper..."
+          gradle wrapper || true
+        fi
+        chmod +x gradlew || true
 
     - name: Compila APK Debug
       run: ./gradlew assembleDebug --stacktrace
