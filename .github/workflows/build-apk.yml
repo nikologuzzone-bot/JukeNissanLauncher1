@@ -12,24 +12,34 @@ jobs:
     - name: Checkout del codice
       uses: actions/checkout@v4
 
-    - name: Trova ed estrai lo ZIP con fallback
+    - name: Estrai lo ZIP con Python
       run: |
-        echo "Contenuto della cartella:"
-        ls -la
+        python3 -c "
+        import glob, zipfile, os, shutil
+        zips = glob.glob('*.zip')
+        if not zips:
+            print('Nessun file zip trovato!')
+            exit(1)
+        zip_name = zips[0]
+        print(f'Trovato zip: {zip_name}')
+        with zipfile.ZipFile(zip_name, 'r') as zip_ref:
+            zip_ref.extractall('unzipped_folder')
         
-        # Cerca qualsiasi file zip nella cartella
-        ZIP_FILE=$(find . -maxdepth 1 -name "*.zip" | head -n 1)
-        
-        if [ -z "$ZIP_FILE" ]; then
-          echo "Errore: Nessun file zip trovato nella root!"
-          exit 1
-        fi
-        
-        echo "Trovato file zip: $ZIP_FILE"
-        unzip -o "$ZIP_FILE" -d unpacked
-        shopt -s dotglob
-        mv unpacked/*/* unpacked/*/.[^.]* ./ 2>/dev/null || true
-        rm -rf unpacked
+        # Sposta i file nella root
+        src = 'unzipped_folder'
+        items = os.listdir(src)
+        if len(items) == 1 and os.path.isdir(os.path.join(src, items[0])):
+            src = os.path.join(src, items[0])
+        for item in os.listdir(src):
+            s = os.path.join(src, item)
+            d = os.path.join('.', item)
+            if os.path.exists(d):
+                if os.path.isdir(d): shutil.rmtree(d)
+                else: os.remove(d)
+            shutil.move(s, d)
+        shutil.rmtree('unzipped_folder')
+        print('Estrazione completata con successo!')
+        "
 
     - name: Configura Java 17
       uses: actions/setup-java@v4
