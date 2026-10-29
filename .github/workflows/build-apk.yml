@@ -57,7 +57,8 @@ jobs:
         chmod +x gradlew
 
     - name: Compila APK Debug
-      run: ./gradlew assembleDebug --stacktrace
+      run: ./gradlew assembleDebug -Dorg.gradle.java.home="${JAVA_HOME}" --stacktrace
+
     - name: Carica l'APK tra gli Artefatti
       uses: actions/upload-artifact@v4
       with:
@@ -66,4 +67,3 @@ jobs:
           app/build/outputs/apk/debug/*.apk
           build/outputs/apk/debug/*.apk
           **/*.apk
-
