@@ -56,8 +56,13 @@ jobs:
         fi
         chmod +x gradlew
 
+    - name: Forza compatibilità Java 17 per Kotlin
+      run: |
+        echo "org.gradle.java.home=${JAVA_HOME}" >> gradle.properties
+        echo "kotlin.compiler.jvmTarget=17" >> gradle.properties
+
     - name: Compila APK Debug
-      run: ./gradlew assembleDebug -Dorg.gradle.java.home="${JAVA_HOME}" --stacktrace
+      run: ./gradlew assembleDebug --stacktrace
 
     - name: Carica l'APK tra gli Artefatti
       uses: actions/upload-artifact@v4
