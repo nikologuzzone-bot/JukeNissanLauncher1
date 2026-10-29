@@ -58,9 +58,12 @@ jobs:
 
     - name: Compila APK Debug
       run: ./gradlew assembleDebug --stacktrace
-
     - name: Carica l'APK tra gli Artefatti
       uses: actions/upload-artifact@v4
       with:
         name: JukeNissanLauncher-APK
-        path: app/build/outputs/apk/debug/app-debug.apk
+        path: |
+          app/build/outputs/apk/debug/*.apk
+          build/outputs/apk/debug/*.apk
+          **/*.apk
+
