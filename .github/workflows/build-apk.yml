@@ -44,17 +44,17 @@ jobs:
                 else: os.remove(d)
             shutil.move(s, d)
         shutil.rmtree('unzipped_folder')
-        print('Estrazione e spostamento completati!')
+        print('Estrazione completata!')
         "
-
-    - name: Verifica e Prepara Gradle
-      run: |
+        echo "Struttura della cartella root:"
         ls -la
+
+    - name: Prepara Gradle Wrapper
+      run: |
         if [ ! -f "gradlew" ]; then
-          echo "Gradlew non trovato nella root, genero il wrapper..."
-          gradle wrapper || true
+          gradle wrapper
         fi
-        chmod +x gradlew || true
+        chmod +x gradlew
 
     - name: Compila APK Debug
       run: ./gradlew assembleDebug --stacktrace
