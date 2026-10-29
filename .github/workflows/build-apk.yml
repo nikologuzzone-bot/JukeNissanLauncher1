@@ -18,22 +18,21 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
 
-    - name: Trova ed estrai il file ZIP
+    - name: Estrai il file ZIP
       run: |
+        echo "File presenti nella root:"
+        ls -la
+        # Trova il file zip e lo scompatta direttamente
         ZIP_FILE=$(find . -maxdepth 1 -name "*.zip" | head -n 1)
-        if [ -n "$ZIP_FILE" ]; then
-          echo "Trovato lo zip: $ZIP_FILE"
-          unzip -q "$ZIP_FILE" -d extracted_project
-          rsync -av extracted_project/*/ ./ 
-        else
-          echo "Nessun file zip trovato!"
-          exit 1
-        fi
+        echo "Trovato: $ZIP_FILE"
+        unzip -o "$ZIP_FILE" -d unpacked
+        # Sposta i file nella cartella principale
+        shopt -s dotglob
+        mv unpacked/*/* unpacked/*/.[^.]* ./ 2>/dev/null || true
+        rm -rf unpacked
 
     - name: Prepara Gradle Wrapper
-      run: |
-        gradle wrapper || true
-        chmod +x gradlew || true
+      run: chmod +x gradlew || true
 
     - name: Compila APK Debug
       run: ./gradlew assembleDebug --stacktrace
