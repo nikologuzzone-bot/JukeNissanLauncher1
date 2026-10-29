@@ -56,10 +56,21 @@ jobs:
         fi
         chmod +x gradlew
 
-    - name: Forza compatibilità Java 17 per Kotlin
+    - name: Aggiorna compatibilità Java nei file di progetto
       run: |
-        echo "org.gradle.java.home=${JAVA_HOME}" >> gradle.properties
-        echo "kotlin.compiler.jvmTarget=17" >> gradle.properties
+        python3 -c "
+        import glob
+        for filepath in glob.glob('**/build.gradle*', recursive=True):
+            if '.gradle' in filepath: continue
+            with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
+                content = f.read()
+            
+            new_content = content.replace('1.8', '17').replace('JavaVersion.VERSION_1_8', 'JavaVersion.VERSION_17')
+            if new_content != content:
+                with open(filepath, 'w', encoding='utf-8') as f:
+                    f.write(new_content)
+                print(f'Aggiornato: {filepath}')
+        "
 
     - name: Compila APK Debug
       run: ./gradlew assembleDebug --stacktrace
