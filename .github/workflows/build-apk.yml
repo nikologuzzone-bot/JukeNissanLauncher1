@@ -20,13 +20,8 @@ jobs:
 
     - name: Estrai il file ZIP
       run: |
-        echo "File presenti nella root:"
-        ls -la
-        # Trova il file zip e lo scompatta direttamente
-        ZIP_FILE=$(find . -maxdepth 1 -name "*.zip" | head -n 1)
-        echo "Trovato: $ZIP_FILE"
-        unzip -o "$ZIP_FILE" -d unpacked
-        # Sposta i file nella cartella principale
+        echo "Estrazione del progetto in corso..."
+        unzip -o "JukeNissanLauncher_9_10-1_pollici.zip" -d unpacked
         shopt -s dotglob
         mv unpacked/*/* unpacked/*/.[^.]* ./ 2>/dev/null || true
         rm -rf unpacked
